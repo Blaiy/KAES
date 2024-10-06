@@ -36,15 +36,16 @@
             border-radius: 25px; /* Rounded corners */
             width: 48%;
         }
-        .btn-primary{
-        background-color: maroon; /* Maroon background */
-        border-color: maroon;     /* Maroon border */
-    }
 
-    .btn-primary:hover {
-        background-color: darkred; /* Darker maroon on hover */
-        border-color: darkred;     /* Darker maroon border on hover */
-    }
+        .btn-primary {
+            background-color: maroon; /* Maroon background */
+            border-color: maroon;     /* Maroon border */
+        }
+
+        .btn-primary:hover {
+            background-color: darkred; /* Darker maroon on hover */
+            border-color: darkred;     /* Darker maroon border on hover */
+        }
     </style>
 
     <script>
@@ -208,6 +209,16 @@
                 </select>
             </div>
 
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+            </div>
+
             <button type="submit" class="btn btn-primary w-100">Register</button>
         </form>
     </div>
@@ -229,7 +240,6 @@
                 <label for="phone" class="form-label">Phone</label>
                 <input type="text" id="phone" name="phone" class="form-control" required>
             </div>
-
             <div class="mb-3">
                 <label for="year_of_birth" class="form-label">Year of Birth</label>
                 <select id="year_of_birth" name="year_of_birth" class="form-select" required>
@@ -244,12 +254,11 @@
             </div>
 
             <div class="mb-3">
-                <label for="graduation_year" class="form-label">Year of Graduation</label>
-                <select id="year_of_graduation" name="graduation_year" class="form-select" required>
-                    <!-- Options for graduation years will be dynamically populated -->
+                <label for="year_of_graduation" class="form-label">Year of Graduation</label>
+                <select id="year_of_graduation" name="year_of_graduation" class="form-select" required>
+                    <!-- Options for years will be dynamically populated -->
                 </select>
             </div>
-
             <div class="mb-3">
                 <label for="employment_status" class="form-label">Employment Status</label>
                 <select id="employment_status" name="employment_status" class="form-select" required>
@@ -286,10 +295,24 @@
                 </select>
             </div>
 
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+            </div>
+
             <button type="submit" class="btn btn-primary w-100">Register</button>
         </form>
     </div>
 </div>
+<div class="text-center mt-4">
+    <a href="login.php" class="btn btn-link">Back to Login</a>
+</div>
+
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

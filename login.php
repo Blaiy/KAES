@@ -83,7 +83,7 @@
 <div class="login-container">
     <h2>KAES</h2>
     <form action="login_handler.php" method="POST">
-        <input type="text" class="form-input" name="username" placeholder="Username" required>
+        <input type="email"  class="form-input"name="email" placeholder="Email" required>
         <input type="password" class="form-input" name="password" placeholder="Password" required>
         <button type="submit" class="login-btn">Login</button>
     </form>
