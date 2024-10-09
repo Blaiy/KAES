@@ -28,8 +28,8 @@ if (mysqli_num_rows($result_alumni) > 0) {
         $_SESSION['email'] = $user['email'];
         $_SESSION['role'] = 'alumni'; // Set the role
 
-        // Redirect to the alumni home page
-        header('Location: alumni_home.php');
+        // Redirect to the  home page
+        header('Location:home.php');
         exit();
     } else {
         // Password does not match
@@ -47,8 +47,8 @@ if (mysqli_num_rows($result_alumni) > 0) {
         $_SESSION['email'] = $user['email'];
         $_SESSION['role'] = 'student'; // Set the role
 
-        // Redirect to the student home page
-        header('Location: student_home.php');
+        // Redirect to the  home page
+        header('Location:home.php');
         exit();
     } else {
         // Password does not match
