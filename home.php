@@ -121,6 +121,10 @@ $user_avatar = isset($_SESSION['avatar']) ? $_SESSION['avatar'] : 'default_avata
         <a href="search.php"><i class="bi bi-search"></i> Search</a>
         <a href="connect.php"><i class="bi bi-people"></i> Connect</a>
         <a href="messages.php"><i class="bi bi-envelope"></i> Messages</a>
+        <a href="events.php" ><i class="bi bi-calendar-event me-2"></i> Events</a>
+
+</a>
+
         <a href="logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a>
     </div>
 
