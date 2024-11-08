@@ -106,7 +106,7 @@ $user_avatar = isset($_SESSION['avatar']) ? $_SESSION['avatar'] : 'default_avata
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="text-center mb-3">
-            <img src="path_to_logo.png" alt="KAES Logo" class="img-fluid" style="width: 100px;">
+            <img src="../images/kabarak logo.png" alt="KAES Logo" class="img-fluid" style="width: 100px;">
         </div>
 
         <!-- Profile Section -->
