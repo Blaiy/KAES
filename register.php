@@ -1,336 +1,416 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - KAES</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        body {
-            background-color: #f4f4f4;
-            height: 100vh;
-        }
-        .register-container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 600px;
-            margin: 30px auto;
-        }
-        h2 {
-            color: maroon;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .rounded-button {
-            border-radius: 25px;
-            width: 48%;
-        }
-        .btn-primary {
-            background-color: maroon;
-            border-color: maroon;
-        }
-        .btn-primary:hover {
-            background-color: darkred;
-            border-color: darkred;
-        }
-        .custom-link {
-    color: maroon; /* Maroon color for the text */
-    text-decoration: none; /* Remove underline */
-    font-weight: bold; /* Make the text bold */
-        }
-
-        .custom-link:hover {
-    color: #D2B48C; /* Light brown color when hovered */
-    text-decoration: underline; /* Optional: Add underline on hover */
-        }
-
-    </style>
+    <title>KAES Registration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
     <script>
-        // Debugging helper function to log when events are triggered
-        function logMessage(message) {
-            console.log(message);
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kabarak-maroon': '#800000',
+                        'kabarak-gold': '#FFD700',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="min-h-screen bg-[url('../images/kabarak-bg.jpg')] bg-cover bg-center bg-no-repeat">
+    <div class="min-h-screen bg-gradient-to-br from-kabarak-maroon/95 via-kabarak-maroon/90 to-black/95 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl p-8">
+                <!-- Logo -->
+                <div class="text-center mb-8">
+                    <img src="images/kabarak logo.png" alt="KAES Logo" class="mx-auto h-24">
+                    <h2 class="mt-6 text-3xl font-bold text-kabarak-maroon">
+                        Join KAES Community
+                    </h2>
+                    <p class="mt-2 text-gray-600">Connect with Kabarak Alumni and Students</p>
+                </div>
+
+                <!-- Registration Type Selection -->
+                <div id="registration-type" class="mb-8">
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="showForm('student')"
+                            class="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border-2 border-transparent hover:border-kabarak-maroon">
+                            <i class="ri-user-follow-line text-3xl text-kabarak-maroon mb-2"></i>
+                            <h3 class="font-semibold text-lg">Student</h3>
+                            <p class="text-sm text-gray-500 text-center mt-2">
+                                Current Kabarak University student
+                            </p>
+                        </button>
+
+                        <button onclick="showForm('alumni')"
+                            class="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all border-2 border-transparent hover:border-kabarak-maroon">
+                            <i class="ri-graduation-cap-line text-3xl text-kabarak-maroon mb-2"></i>
+                            <h3 class="font-semibold text-lg">Alumni</h3>
+                            <p class="text-sm text-gray-500 text-center mt-2">
+                                Graduated from Kabarak University
+                            </p>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Student Registration Form -->
+                <div id="student-form" class="hidden bg-white rounded-xl shadow-sm p-8" style="display: none;">
+                    <div class="flex items-center mb-6">
+                        <button onclick="showRegistrationTypes()" class="text-kabarak-maroon hover:text-kabarak-maroon/80">
+                            <i class="ri-arrow-left-line text-xl"></i>
+                        </button>
+                        <h3 class="text-xl font-semibold ml-4">Student Registration</h3>
+                    </div>
+
+                    <form action="student_registration.php" method="POST" class="space-y-6">
+                        <!-- Personal Information -->
+                        <div class="space-y-6 p-6 bg-gray-50 rounded-lg">
+                            <h4 class="font-semibold text-lg text-kabarak-maroon">Personal Information</h4>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                    <input type="text" name="name" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Registration Number</label>
+                                    <input type="text" name="reg_number" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <input type="email" name="email" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                    <input type="tel" name="phone" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Academic Information -->
+                        <div class="space-y-6 p-6 bg-gray-50 rounded-lg">
+                            <h4 class="font-semibold text-lg text-kabarak-maroon">Academic Information</h4>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">School</label>
+                                    <select name="school" required onchange="populateCourses('student')"
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                        <option value="">Select School</option>
+                                        <option value="science">School of Science & Technology</option>
+                                        <option value="business">School of Business</option>
+                                        <!-- Add other schools -->
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Course</label>
+                                    <select name="course" required id="student-course"
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                        <option value="">Select Course</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Year of Study</label>
+                                    <select name="year_of_study" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                        <!-- Will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Security -->
+                        <div class="space-y-6 p-6 bg-gray-50 rounded-lg">
+                            <h4 class="font-semibold text-lg text-kabarak-maroon">Account Security</h4>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                    <input type="password" name="password" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                                    <input type="password" name="confirm_password" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full bg-kabarak-maroon text-white py-3 px-4 rounded-lg hover:bg-kabarak-maroon/90 transition-colors">
+                            Create Account
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Alumni Registration Form -->
+                <div id="alumni-form" class="hidden bg-white rounded-xl shadow-sm p-8" style="display: none;">
+                    <div class="flex items-center mb-6">
+                        <button onclick="showRegistrationTypes()" class="text-kabarak-maroon hover:text-kabarak-maroon/80">
+                            <i class="ri-arrow-left-line text-xl"></i>
+                        </button>
+                        <h3 class="text-xl font-semibold ml-4">Alumni Registration</h3>
+                    </div>
+
+                    <form action="alumni_registration.php" method="POST" class="space-y-6">
+                        <!-- Personal Information -->
+                        <div class="space-y-6 p-6 bg-gray-50 rounded-lg">
+                            <h4 class="font-semibold text-lg text-kabarak-maroon">Personal Information</h4>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                    <input type="text" name="name" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <input type="email" name="email" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                    <input type="tel" name="phone" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Current Location</label>
+                                    <input type="text" name="location" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Academic Information -->
+                        <div class="space-y-6 p-6 bg-gray-50 rounded-lg">
+                            <h4 class="font-semibold text-lg text-kabarak-maroon">Academic Information</h4>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">School</label>
+                                    <select name="school" id="alumni-school" required onchange="populateCourses('alumni')"
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                        <option value="">Select School</option>
+                                        <?php
+                                        require_once 'db.php';
+                                        try {
+                                            $stmt = $pdo->query("SELECT id, name FROM schools ORDER BY name");
+                                            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                echo "<option value='" . $row['id'] . "'>" . htmlspecialchars($row['name']) . "</option>";
+                                            }
+                                        } catch (PDOException $e) {
+                                            echo "<option value=''>Error loading schools</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Course</label>
+                                    <select name="course" required id="alumni-course"
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                        <option value="">Select Course</option>
+                                        <?php
+                                        if (isset($_GET['school_id'])) {
+                                            try {
+                                                $stmt = $pdo->prepare("SELECT id, name FROM courses WHERE school_id = ?");
+                                                $stmt->execute([$_GET['school_id']]);
+                                                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                                    echo "<option value='" . $row['id'] . "'>" . htmlspecialchars($row['name']) . "</option>";
+                                                }
+                                            } catch (PDOException $e) {
+                                                echo "<option value=''>Error loading courses</option>";
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Year of Graduation</label>
+                                    <select name="year_of_graduation" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                        <!-- Will be populated by JavaScript -->
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Employment Status</label>
+                                    <select name="employment_status" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                        <option value="">Select Status</option>
+                                        <option value="employed">Employed</option>
+                                        <option value="self_employed">Self Employed</option>
+                                        <option value="unemployed">Unemployed</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Security -->
+                        <div class="space-y-6 p-6 bg-gray-50 rounded-lg">
+                            <h4 class="font-semibold text-lg text-kabarak-maroon">Account Security</h4>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                    <input type="password" name="password" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                                    <input type="password" name="confirm_password" required
+                                        class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full bg-kabarak-maroon text-white py-3 px-4 rounded-lg hover:bg-kabarak-maroon/90 transition-colors">
+                            Create Account
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Login Link -->
+                <div class="text-center mt-8">
+                    <p class="text-gray-600">
+                        Already have an account?
+                        <a href="login.php" class="text-kabarak-maroon hover:text-kabarak-maroon/80 font-semibold">
+                            Sign in
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadSchools() {
+            try {
+                const response = await fetch('get_schools.php');
+                if (!response.ok) throw new Error('Failed to fetch schools');
+
+                const schools = await response.json();
+                const studentSchool = document.querySelector('select[name="school"]');
+                const alumniSchool = document.querySelector('select[name="school"]');
+
+                const defaultOption = '<option value="">Select School</option>';
+                studentSchool.innerHTML = defaultOption;
+                alumniSchool.innerHTML = defaultOption;
+
+                schools.forEach(school => {
+                    const option = `<option value="${school.id}">${school.name}</option>`;
+                    studentSchool.insertAdjacentHTML('beforeend', option);
+                    alumniSchool.insertAdjacentHTML('beforeend', option);
+                });
+            } catch (error) {
+                console.error('Error loading schools:', error);
+                alert('Failed to load schools. Please refresh the page.');
+            }
         }
 
-        function showForm(userType) {
-            logMessage(`Showing form: ${userType}`);
-            document.getElementById('button-options').style.display = 'none';
+        async function populateCourses(formType) {
+            const schoolSelect = document.querySelector(`#${formType}-form select[name="school"]`);
+            const courseSelect = document.querySelector(`#${formType}-form select[name="course"]`);
+            const schoolId = schoolSelect.value;
+
+            try {
+                courseSelect.innerHTML = '<option value="">Loading courses...</option>';
+                courseSelect.disabled = true;
+
+                const response = await fetch(`get_courses.php?school_id=${schoolId}`);
+                if (!response.ok) throw new Error('Failed to fetch courses');
+
+                const courses = await response.json();
+
+                courseSelect.innerHTML = '<option value="">Select Course</option>';
+                courses.forEach(course => {
+                    courseSelect.insertAdjacentHTML('beforeend',
+                        `<option value="${course.id}">${course.name}</option>`
+                    );
+                });
+            } catch (error) {
+                console.error('Error loading courses:', error);
+                courseSelect.innerHTML = '<option value="">Failed to load courses</option>';
+            } finally {
+                courseSelect.disabled = false;
+            }
+        }
+
+        // Update form visibility functions
+        function showRegistrationTypes() {
+            document.getElementById('registration-type').style.display = 'block';
             document.getElementById('student-form').style.display = 'none';
             document.getElementById('alumni-form').style.display = 'none';
-
-            if (userType === 'student') {
-                document.getElementById('student-form').style.display = 'block';
-            } else if (userType === 'alumni') {
-                document.getElementById('alumni-form').style.display = 'block';
-            }
         }
 
-        // Updated function to include logging and debugging
-        function populateCourses(formType) {
-            logMessage(`Populating courses for form: ${formType}`);
-
-            const schoolElement = document.getElementById(`${formType}-school`);
-            const courseElement = document.getElementById(`${formType}-course`);
-            const selectedSchool = schoolElement.value;
-
-            logMessage(`Selected School: ${selectedSchool}`);
-
-            let courses = [];
-
-            courseElement.innerHTML = '<option value="">-- Select Course --</option>';
-
-            switch (selectedSchool) {
-                case 'science':
-                    courses = ['IT', 'Computer Science', 'Computer Forensics', 'Telecommunication'];
-                    break;
-                case 'pharmacy':
-                    courses = ['Pharmacy'];
-                    break;
-                case 'law':
-                    courses = ['Bachelor of Law (LLB)'];
-                    break;
-                case 'business':
-                    courses = ['Bachelor of Commerce', 'Business IT', 'Economics'];
-                    break;
-                case 'education':
-                    courses = ['Education (Arts)', 'Education (Science)', 'Early Childhood Development'];
-                    break;
-                case 'media':
-                    courses = ['Media and Communication', 'Music', 'Performing Arts'];
-                    break;
-                case 'health':
-                    courses = ['Nursing', 'Clinical Medicine', 'Public Health'];
-                    break;
-                default:
-                    logMessage('No courses available for this school');
-            }
-
-            courses.forEach(course => {
-                const option = document.createElement('option');
-                option.value = course;
-                option.textContent = course;
-                courseElement.appendChild(option);
-            });
-
-            logMessage(`Courses populated for school: ${selectedSchool}`);
+        function showForm(type) {
+            document.getElementById('registration-type').style.display = 'none';
+            document.getElementById('student-form').style.display = type === 'student' ? 'block' : 'none';
+            document.getElementById('alumni-form').style.display = type === 'alumni' ? 'block' : 'none';
         }
 
-        function populateYearOfStudy() {
-            const yearOfStudyElement = document.getElementById('year_of_study');
-            const maxYears = 5;
-            const semesters = ['S1', 'S2', 'S3'];
+        // Initialize the page
+        window.onload = function() {
+            loadSchools();
 
-            yearOfStudyElement.innerHTML = '<option value="">-- Select Year of Study --</option>';
-            for (let year = 1; year <= maxYears; year++) {
-                semesters.forEach(semester => {
+            // Populate year of study for students
+            const yearOfStudySelect = document.querySelector('select[name="year_of_study"]');
+            yearOfStudySelect.innerHTML = '<option value="">Select Year of Study</option>';
+            for (let year = 1; year <= 5; year++) {
+                ['S1', 'S2', 'S3'].forEach(semester => {
                     const option = document.createElement('option');
-                    option.value = `Y${year} ${semester}`;
-                    option.textContent = `Y${year} ${semester}`;
-                    yearOfStudyElement.appendChild(option);
+                    option.value = `Y${year}${semester}`;
+                    option.textContent = `Year ${year} - ${semester}`;
+                    yearOfStudySelect.appendChild(option);
                 });
             }
-        }
 
-        function populateGraduationYear() {
-            const graduationYearElement = document.getElementById('year_of_graduation');
+            // Populate graduation years for alumni
+            const graduationYearSelect = document.querySelector('select[name="year_of_graduation"]');
+            graduationYearSelect.innerHTML = '<option value="">Select Graduation Year</option>';
             const currentYear = new Date().getFullYear();
-            const startYear = 2002;
-
-            graduationYearElement.innerHTML = '<option value="">-- Select Year of Graduation --</option>';
-            for (let year = startYear; year <= currentYear; year++) {
+            for (let year = currentYear; year >= 2002; year--) {
                 const option = document.createElement('option');
                 option.value = year;
                 option.textContent = year;
-                graduationYearElement.appendChild(option);
+                graduationYearSelect.appendChild(option);
             }
-        }
 
-        window.onload = function() {
-            logMessage('Page loaded');
-            populateYearOfStudy();
-            populateGraduationYear();
+            // Add event listeners for school selection
+            document.querySelectorAll('select[name="school"]').forEach(select => {
+                select.addEventListener('change', (e) => {
+                    const formType = e.target.closest('form').id.split('-')[0];
+                    populateCourses(formType);
+                });
+            });
         };
     </script>
-</head>
-<body>
-
-<div class="register-container">
-    <h2>KAES Registration</h2>
-
-    <div id="button-options" class="d-flex justify-content-between">
-        <button class="btn btn-maroon rounded-button" onclick="showForm('student')">Student</button>
-        <button class="btn btn-maroon rounded-button" onclick="showForm('alumni')">Alumni</button>
-    </div>
-
-    <!-- Student Registration Form -->
-    <div id="student-form" class="hidden" style="display: none;">
-        <form action="student_registration.php" method="POST" class="mt-4">
-            <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" id="name" name="name" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" id="email" name="email" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label for="phone" class="form-label">Phone</label>
-                <input type="text" id="phone" name="phone" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="year_of_birth" class="form-label">Year of Birth</label>
-                <select id="year_of_birth" name="year_of_birth" class="form-select" required>
-                    <option value="">-- Select Year of Birth --</option>
-                    <?php
-                    $currentYear = date("Y");
-                    for ($year = 1970; $year <= $currentYear; $year++) {
-                        echo "<option value='$year'>$year</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="student-school" class="form-label">School</label>
-                <select id="student-school" name="school" class="form-select" required onchange="populateCourses('student')">
-                    <option value="">-- Select School --</option>
-                    <option value="science">School of Science, Engineering & Technology</option>
-                    <option value="pharmacy">School of Pharmacy</option>
-                    <option value="law">School of Law</option>
-                    <option value="business">School of Business</option>
-                    <option value="education">School of Education</option>
-                    <option value="media">School of Media & Music</option>
-                    <option value="health">School of Health & Sciences</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="student-course" class="form-label">Course</label>
-                <select id="student-course" name="course" class="form-select" required>
-                    <!-- Courses will be dynamically populated -->
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="reg_number" class="form-label">Registration Number</label>
-                <input type="text" id="reg_number" name="reg_number" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="year_of_study" class="form-label">Year of Study</label>
-                <select id="year_of_study" name="year_of_study" class="form-select" required>
-                    <!-- Options for Y1 S1, Y1 S3, up to Y5 S3 will be dynamically populated -->
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" id="password" name="password" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="confirm_password" class="form-label">Confirm Password</label>
-                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">Register</button>
-        </form>
-    </div>
-
-    <!-- Alumni Registration Form -->
-    <div id="alumni-form" class="hidden" style="display: none;">
-        <form action="alumni_registration.php" method="POST" class="mt-4">
-            <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" id="name" name="name" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" id="email" name="email" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label for="phone" class="form-label">Phone</label>
-                <input type="text" id="phone" name="phone" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="year_of_birth" class="form-label">Year of Birth</label>
-                <select id="year_of_birth" name="year_of_birth" class="form-select" required>
-                    <option value="">-- Select Year of Birth --</option>
-                    <?php
-                    for ($year = 1970; $year <= $currentYear; $year++) {
-                        echo "<option value='$year'>$year</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="alumni-school" class="form-label">School</label>
-                <select id="alumni-school" name="school" class="form-select" required onchange="populateCourses('alumni')">
-                    <option value="">-- Select School --</option>
-                    <option value="science">School of Science, Engineering & Technology</option>
-                    <option value="pharmacy">School of Pharmacy</option>
-                    <option value="law">School of Law</option>
-                    <option value="business">School of Business</option>
-                    <option value="education">School of Education</option>
-                    <option value="media">School of Media & Music</option>
-                    <option value="health">School of Health & Sciences</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="alumni-course" class="form-label">Course</label>
-                <select id="alumni-course" name="course" class="form-select" required>
-                    <!-- Courses will be dynamically populated -->
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="year_of_graduation" class="form-label">Year of Graduation</label>
-                <select id="year_of_graduation" name="year_of_graduation" class="form-select" required>
-                    <!-- Options for Year of Graduation will be dynamically populated -->
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="employment_status" class="form-label">Employment Status</label>
-                <select id="employment_status" name="employment_status" class="form-select" required>
-                    <option value="">-- Select Employment Status --</option>
-                    <option value="employed">Employed</option>
-                    <option value="unemployed">Unemployed</option>
-                    <option value="self_employed">Self-employed</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="location" class="form-label">Location</label>
-                <input type="text" id="location" name="location" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" id="password" name="password" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="confirm_password" class="form-label">Confirm Password</label>
-                <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">Register</button>
-        </form>
-    </div>
-        <div class="text-center mt-4">
-            <a href="login.php" class="btn btn-link custom-link">Back to Login</a>
-        </div>
-</div>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
