@@ -127,4 +127,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                         <div class="flex justify-end space-x-4">
                             <a href="forum.php" 
-                               class="px-4 py-2 border border-gray-300 rounded-lg
+                               class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-kabarak-maroon">
+                                Cancel
+                            </a>
+                            <button type="submit"
+                                    class="px-4 py-2 bg-kabarak-maroon text-white rounded-lg hover:bg-kabarak-maroon-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-kabarak-maroon">
+                                Create Topic
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Optional: Add client-side validation or enhanced functionality here
+        document.addEventListener('DOMContentLoaded', function() {
+            // You could add tag input enhancement, rich text editor, etc.
+        });
+    </script>
+</body>
+</html>
