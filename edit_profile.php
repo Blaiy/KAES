@@ -32,6 +32,10 @@ try {
     $stmt->execute([$user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    if (!$user) {
+        throw new Exception("User not found");
+    }
+
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = $_POST['name'] ?? '';
         $email = $_POST['email'] ?? '';
@@ -95,8 +99,18 @@ try {
         }
     }
 
-} catch (PDOException $e) {
+} catch (Exception $e) {
     $_SESSION['error_message'] = "Error fetching user details: " . $e->getMessage();
+    $user = [
+        'name' => '',
+        'email' => '',
+        'phone' => '',
+        'location' => '',
+        'avatar' => '',
+        'reg_number' => '',
+        'employment_status' => '',
+        'year_of_graduation' => ''
+    ];
 }
 ?>
 
@@ -163,19 +177,19 @@ try {
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                            <input type="text" name="name" value="<?php echo htmlspecialchars($user['name']); ?>" required
+                            <input type="text" name="name" value="<?php echo htmlspecialchars($user['name'] ?? ''); ?>" required
                                    class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <input type="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required
+                            <input type="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required
                                    class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                            <input type="tel" name="phone" value="<?php echo htmlspecialchars($user['phone']); ?>" required
+                            <input type="tel" name="phone" value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>" required
                                    class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-kabarak-maroon focus:border-transparent">
                         </div>
 
@@ -190,19 +204,19 @@ try {
                     <?php if ($user_type === 'student'): ?>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Registration Number</label>
-                            <input type="text" value="<?php echo htmlspecialchars($user['reg_number']); ?>" disabled
+                            <input type="text" value="<?php echo htmlspecialchars($user['reg_number'] ?? ''); ?>" disabled
                                    class="w-full px-4 py-2 rounded-lg border bg-gray-50">
                         </div>
                     <?php else: ?>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Graduation Year</label>
-                                <input type="text" value="<?php echo htmlspecialchars($user['year_of_graduation']); ?>" disabled
+                                <input type="text" value="<?php echo htmlspecialchars($user['year_of_graduation'] ?? ''); ?>" disabled
                                        class="w-full px-4 py-2 rounded-lg border bg-gray-50">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Employment Status</label>
-                                <input type="text" value="<?php echo htmlspecialchars($user['employment_status']); ?>" disabled
+                                <input type="text" value="<?php echo htmlspecialchars($user['employment_status'] ?? ''); ?>" disabled
                                        class="w-full px-4 py-2 rounded-lg border bg-gray-50">
                             </div>
                         </div>

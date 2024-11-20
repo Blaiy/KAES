@@ -1,3 +1,57 @@
+<?php
+// Add this at the top of sidebar.php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Get user details from the session
+$user_id = $_SESSION['user_id'] ?? null;
+$user_type = $_SESSION['user_type'] ?? null;
+
+// Initialize default values
+$user_name = '';
+$user_avatar = '';
+
+// Only fetch user data if user is logged in
+if ($user_id) {
+    try {
+        require_once __DIR__ . '/../db.php';
+        
+        $stmt = $pdo->prepare("
+            SELECT 
+                COALESCE(s.name, a.name) as name,
+                COALESCE(s.avatar, a.avatar) as avatar
+            FROM users u
+            LEFT JOIN students s ON u.id = s.user_id
+            LEFT JOIN alumni a ON u.id = a.user_id
+            WHERE u.id = ?
+        ");
+        
+        $stmt->execute([$user_id]);
+        $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $user_name = $user_data['name'] ?? '';
+        $user_avatar = $user_data['avatar'] ?? '';
+    } catch (PDOException $e) {
+        // Silently handle the error - don't show database errors in the sidebar
+        error_log("Sidebar error: " . $e->getMessage());
+    }
+}
+?>
+
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'kabarak-maroon': '#800000',
+                        'kabarak-gold': '#FFD700',
+                    }
+                }
+            }
+        }
+    </script>
+
 <!-- Sidebar -->
 <div class="lg:hidden fixed inset-0 bg-black/50 z-40 transition-opacity duration-300" 
      id="sidebar-overlay"
