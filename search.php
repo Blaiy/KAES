@@ -1,51 +1,71 @@
 <?php
 session_start();
 require_once 'db.php';
+require_once 'functions.php';
 
+// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-$search_query = isset($_GET['q']) ? trim($_GET['q']) : '';
-$filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
+// Search functionality
+$search_query = isset($_GET['query']) ? trim($_GET['query']) : '';
+$search_type = isset($_GET['type']) ? $_GET['type'] : 'all';
+
 $results = [];
+$error = '';
 
 if (!empty($search_query)) {
     try {
-        if ($filter === 'users' || $filter === 'all') {
-            $stmt = $pdo->prepare("
-                SELECT 
-                    u.id,
-                    u.email,
-                    COALESCE(s.name, a.name) as name,
-                    CASE 
-                        WHEN s.id IS NOT NULL THEN 'Student'
-                        WHEN a.id IS NOT NULL THEN 'Alumni'
-                    END as user_type
-                FROM users u
-                LEFT JOIN students s ON u.id = s.user_id
-                LEFT JOIN alumni a ON u.id = a.user_id
-                WHERE COALESCE(s.name, a.name) LIKE :search
-                OR u.email LIKE :search
-            ");
-            $stmt->execute(['search' => "%$search_query%"]);
-            $results['users'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
+        // Search Users
+        $user_stmt = $pdo->prepare("
+            SELECT id, username, email 
+            FROM users 
+            WHERE username LIKE ? OR email LIKE ?
+            LIMIT 10
+        ");
+        $user_stmt->execute(["%$search_query%", "%$search_query%"]);
+        $user_results = $user_stmt->fetchAll();
 
-        if ($filter === 'events' || $filter === 'all') {
-            $stmt = $pdo->prepare("
-                SELECT title, description, event_date, location
-                FROM events
-                WHERE title LIKE :search
-                OR description LIKE :search
-                ORDER BY event_date ASC
-            ");
-            $stmt->execute(['search' => "%$search_query%"]);
-            $results['events'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-    } catch (PDOException $e) {
-        $error = "An error occurred while searching. Please try again.";
+        // Search Topics
+        $topic_stmt = $pdo->prepare("
+            SELECT 
+                ft.id, 
+                ft.title, 
+                ft.content, 
+                fc.name as category, 
+                u.username 
+            FROM forum_topics ft
+            JOIN forum_categories fc ON ft.category_id = fc.id
+            JOIN users u ON ft.user_id = u.id
+            WHERE 
+                ft.title LIKE ? OR 
+                ft.content LIKE ? 
+            LIMIT 10
+        ");
+        $topic_stmt->execute(["%$search_query%", "%$search_query%"]);
+        $topic_results = $topic_stmt->fetchAll();
+
+        // Search Events (assuming you have an events table)
+        $event_stmt = $pdo->prepare("
+            SELECT 
+                id, 
+                title, 
+                description, 
+                start_date, 
+                location 
+            FROM events 
+            WHERE 
+                title LIKE ? OR 
+                description LIKE ? OR 
+                location LIKE ?
+            LIMIT 10
+        ");
+        $event_stmt->execute(["%$search_query%", "%$search_query%", "%$search_query%"]);
+        $event_results = $event_stmt->fetchAll();
+    } catch (Exception $e) {
+        $error = "An error occurred during search.";
     }
 }
 ?>
@@ -55,93 +75,125 @@ if (!empty($search_query)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search</title>
+    <title>Search - KAES Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
-<body class="bg-gray-50">
-    <div class="max-w-4xl mx-auto p-4">
-        <!-- Search Form -->
-        <form method="GET" class="mb-8">
-            <div class="space-y-4">
-                <input type="text" 
-                       name="q" 
-                       value="<?php echo htmlspecialchars($search_query); ?>"
-                       class="w-full px-4 py-2 rounded-lg border"
-                       placeholder="Search for users or events...">
 
-                <div class="flex space-x-4">
-                    <a href="?q=<?php echo urlencode($search_query); ?>&filter=all" 
-                       class="<?php echo $filter === 'all' ? 'text-blue-600 font-bold' : ''; ?>">
-                        All
-                    </a>
-                    <a href="?q=<?php echo urlencode($search_query); ?>&filter=users" 
-                       class="<?php echo $filter === 'users' ? 'text-blue-600 font-bold' : ''; ?>">
-                        Users
-                    </a>
-                    <a href="?q=<?php echo urlencode($search_query); ?>&filter=events" 
-                       class="<?php echo $filter === 'events' ? 'text-blue-600 font-bold' : ''; ?>">
-                        Events
-                    </a>
+<body class="bg-gray-50">
+    <?php include 'partials/sidebar.php'; ?>
+
+    <main class="lg:ml-64 min-h-screen">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="bg-white rounded-xl shadow-sm">
+                <div class="p-6 border-b border-gray-200">
+                    <h1 class="text-2xl font-bold text-kabarak-maroon mb-4">
+                         Search
+                    </h1>
+
+                    <form method="GET" class="mb-6">
+                        <div class="flex space-x-2">
+                            <input 
+                                type="text" 
+                                name="query" 
+                                value="<?php echo htmlspecialchars($search_query); ?>"
+                                placeholder="Search users, topics, events..."
+                                class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-kabarak-maroon focus:ring-kabarak-maroon"
+                            >
+                            <select 
+                                name="type" 
+                                class="rounded-lg border-gray-300 shadow-sm focus:border-kabarak-maroon focus:ring-kabarak-maroon"
+                            >
+                                <option value="all" <?php echo ($search_type == 'all' ? 'selected' : ''); ?>>All</option>
+                                <option value="users" <?php echo ($search_type == 'users' ? 'selected' : ''); ?>>Users</option>
+                                <option value="topics" <?php echo ($search_type == 'topics' ? 'selected' : ''); ?>>Topics</option>
+                                <option value="events" <?php echo ($search_type == 'events' ? 'selected' : ''); ?>>Events</option>
+                            </select>
+                            <button 
+                                type="submit" 
+                                class="px-4 py-2 bg-kabarak-maroon text-white rounded-lg hover:bg-kabarak-maroon-dark"
+                            >
+                                Search
+                            </button>
+                        </div>
+                    </form>
+
+                    <?php if ($error): ?>
+                        <div class="bg-red-50 text-red-500 p-4 rounded-lg mb-4">
+                            <?php echo htmlspecialchars($error); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($search_query)): ?>
+                        <div class="space-y-6">
+                            <!-- Users Results -->
+                            <?php if (!empty($user_results)): ?>
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-900 mb-3">Users</h2>
+                                    <div class="space-y-2">
+                                        <?php foreach ($user_results as $user): ?>
+                                            <div class="bg-gray-100 p-3 rounded-lg flex justify-between items-center">
+                                                <div>
+                                                    <span class="font-medium"><?php echo htmlspecialchars($user['username']); ?></span>
+                                                    <span class="text-gray-500 text-sm ml-2"><?php echo htmlspecialchars($user['email']); ?></span>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Topics Results -->
+                            <?php if (!empty($topic_results)): ?>
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-900 mb-3">Topics</h2>
+                                    <div class="space-y-2">
+                                        <?php foreach ($topic_results as $topic): ?>
+                                            <div class="bg-gray-100 p-3 rounded-lg">
+                                                <a href="forum_topic_detail.php?id=<?php echo $topic['id']; ?>" class="block">
+                                                    <h3 class="font-medium text-kabarak-maroon"><?php echo htmlspecialchars($topic['title']); ?></h3>
+                                                    <p class="text-sm text-gray-600 line-clamp-2"><?php echo htmlspecialchars($topic['content']); ?></p>
+                                                    <div class="text-xs text-gray-500 mt-1">
+                                                        Category: <?php echo htmlspecialchars($topic['category']); ?> 
+                                                        | By <?php echo htmlspecialchars($topic['username']); ?>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Events Results -->
+                            <?php if (!empty($event_results)): ?>
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-900 mb-3">Events</h2>
+                                    <div class="space-y-2">
+                                        <?php foreach ($event_results as $event): ?>
+                                            <div class="bg-gray-100 p-3 rounded-lg">
+                                                <h3 class="font-medium text-kabarak-maroon"><?php echo htmlspecialchars($event['title']); ?></h3>
+                                                <p class="text-sm text-gray-600 line-clamp-2"><?php echo htmlspecialchars($event['description']); ?></p>
+                                                <div class="text-xs text-gray-500 mt-1">
+                                                    Date: <?php echo date('M d, Y', strtotime($event['start_date'])); ?> 
+                                                    | Location: <?php echo htmlspecialchars($event['location']); ?>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- No Results -->
+                            <?php if (empty($user_results) && empty($topic_results) && empty($event_results)): ?>
+                                <div class="text-center text-gray-500 p-6">
+                                    No results found for "<?php echo htmlspecialchars($search_query); ?>"
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
-        </form>
-
-        <!-- Results -->
-        <?php if (!empty($search_query)): ?>
-            <?php if (isset($error)): ?>
-                <div class="bg-red-100 border border-red-400 text-red-700 p-4 rounded-lg">
-                    <?php echo $error; ?>
-                </div>
-            <?php else: ?>
-                <!-- Users Results -->
-                <?php if ($filter !== 'events' && !empty($results['users'])): ?>
-                    <div class="mb-8">
-                        <h2 class="text-xl font-bold mb-4">Users</h2>
-                        <div class="space-y-4">
-                            <?php foreach ($results['users'] as $user): ?>
-                                <div class="bg-white p-4 rounded-lg shadow-sm">
-                                    <div class="flex justify-between items-center">
-                                        <div>
-                                            <h3 class="font-semibold"><?php echo htmlspecialchars($user['name']); ?></h3>
-                                            <p class="text-sm text-gray-500"><?php echo htmlspecialchars($user['user_type']); ?></p>
-                                        </div>
-                                        <a href="profile.php?id=<?php echo $user['id']; ?>" 
-                                           class="bg-blue-600 text-white px-4 py-2 rounded-lg">
-                                            View Profile
-                                        </a>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
-
-                <!-- Events Results -->
-                <?php if ($filter !== 'users' && !empty($results['events'])): ?>
-                    <div>
-                        <h2 class="text-xl font-bold mb-4">Events</h2>
-                        <div class="space-y-4">
-                            <?php foreach ($results['events'] as $event): ?>
-                                <div class="bg-white p-4 rounded-lg shadow-sm">
-                                    <h3 class="font-semibold"><?php echo htmlspecialchars($event['title']); ?></h3>
-                                    <p class="text-sm text-gray-600 mt-1"><?php echo htmlspecialchars($event['description']); ?></p>
-                                    <div class="mt-2 text-sm text-gray-500">
-                                        <p>Date: <?php echo date('F j, Y', strtotime($event['event_date'])); ?></p>
-                                        <p>Location: <?php echo htmlspecialchars($event['location']); ?></p>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
-
-                <?php if (empty($results['users']) && empty($results['events'])): ?>
-                    <div class="text-center py-8 text-gray-500">
-                        No results found. Try different search terms.
-                    </div>
-                <?php endif; ?>
-            <?php endif; ?>
-        <?php endif; ?>
-    </div>
+        </div>
+    </main>
 </body>
 </html>
