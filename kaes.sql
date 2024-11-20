@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 09, 2024 at 09:56 PM
+-- Generation Time: Nov 20, 2024 at 06:54 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -75,7 +75,8 @@ INSERT INTO `comments` (`id`, `post_id`, `user_id`, `parent_id`, `content`, `cre
 (1, 3, 1, NULL, 'This is awesome', '2024-11-09 10:31:47'),
 (2, 3, 1, 1, 'I like it', '2024-11-09 10:32:10'),
 (3, 3, 2, NULL, 'This is awesome', '2024-11-09 20:24:00'),
-(4, 3, 2, 3, '45', '2024-11-09 20:24:14');
+(4, 3, 2, 3, '45', '2024-11-09 20:24:14'),
+(5, 5, 1, NULL, 'This is great', '2024-11-20 05:28:35');
 
 -- --------------------------------------------------------
 
@@ -156,6 +157,66 @@ INSERT INTO `courses` (`id`, `name`, `code`, `school_id`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `forum_categories`
+--
+
+CREATE TABLE `forum_categories` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `forum_replies`
+--
+
+CREATE TABLE `forum_replies` (
+  `id` int(11) NOT NULL,
+  `topic_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `content` text NOT NULL,
+  `is_solution` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `forum_topics`
+--
+
+CREATE TABLE `forum_topics` (
+  `id` int(11) NOT NULL,
+  `category_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `views` int(11) DEFAULT 0,
+  `is_pinned` tinyint(1) DEFAULT 0,
+  `is_locked` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `forum_topic_tags`
+--
+
+CREATE TABLE `forum_topic_tags` (
+  `id` int(11) NOT NULL,
+  `topic_id` int(11) NOT NULL,
+  `tag_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `jobs`
 --
 
@@ -192,7 +253,8 @@ CREATE TABLE `likes` (
 
 INSERT INTO `likes` (`id`, `post_id`, `user_id`, `created_at`) VALUES
 (6, 3, 2, '2024-11-09 20:23:52'),
-(7, 4, 1, '2024-11-09 20:48:50');
+(7, 4, 1, '2024-11-09 20:48:50'),
+(8, 5, 1, '2024-11-20 05:27:26');
 
 -- --------------------------------------------------------
 
@@ -243,7 +305,8 @@ CREATE TABLE `posts` (
 
 INSERT INTO `posts` (`id`, `user_id`, `content`, `image_url`, `created_at`, `location`) VALUES
 (3, 2, 'Hey I\'m in Los Angeles', 'uploads/posts/672f34de71ba3.jpg', '2024-11-09 10:09:34', 'Los Angeles'),
-(4, 1, 'Education in Biblical Perpective', 'uploads/posts/672fc9b57cc3b.jpg', '2024-11-09 20:44:37', 'Kabarak University');
+(4, 1, 'Education in Biblical Perpective', 'uploads/posts/672fc9b57cc3b.jpg', '2024-11-09 20:44:37', 'Kabarak University'),
+(5, 3, 'The SSET team department of computer science and it had an academic trip to mombasa, where i got to experience this beautiful sunrise at 6.00 am', 'uploads/posts/673d71d84cf87.jpg', '2024-11-20 05:21:28', 'Shanzu, Mombasa');
 
 -- --------------------------------------------------------
 
@@ -264,7 +327,15 @@ CREATE TABLE `post_shares` (
 --
 
 INSERT INTO `post_shares` (`id`, `post_id`, `user_id`, `share_text`, `created_at`) VALUES
-(1, 3, 1, '', '2024-11-09 10:39:00');
+(1, 3, 1, '', '2024-11-09 10:39:00'),
+(2, 5, 1, 'This is great', '2024-11-20 05:27:52'),
+(3, 5, 1, 'This is great', '2024-11-20 05:27:54'),
+(4, 5, 1, 'This is great', '2024-11-20 05:27:57'),
+(5, 5, 1, 'This is great', '2024-11-20 05:27:58'),
+(6, 5, 1, 'This is great', '2024-11-20 05:27:58'),
+(7, 5, 1, 'This is great', '2024-11-20 05:27:59'),
+(8, 5, 1, 'This is great', '2024-11-20 05:28:00'),
+(9, 5, 1, 'This is great', '2024-11-20 05:28:01');
 
 -- --------------------------------------------------------
 
@@ -335,7 +406,8 @@ CREATE TABLE `students` (
 --
 
 INSERT INTO `students` (`id`, `user_id`, `name`, `reg_number`, `phone`, `school_id`, `course_id`, `year_of_study`, `created_at`, `avatar`) VALUES
-(1, 1, 'Asher Stanton', '132', '+1 (909) 525-5129', 1, 1, 'Y1S1', '2024-11-09 08:29:14', 'default_avatar.png');
+(1, 1, 'Asher Stanton', '132', '+1 (909) 525-5129', 1, 1, 'Y1S1', '2024-11-09 08:29:14', 'default_avatar.png'),
+(2, 3, 'Annabel Blessing', 'CS/MG/3073/09/21', '0711234323', 1, 1, 'Y4S2', '2024-11-20 05:13:50', 'default_avatar.png');
 
 -- --------------------------------------------------------
 
@@ -357,7 +429,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `email`, `password`, `user_type`, `created_at`) VALUES
 (1, 'xixijysy@mailinator.com', '$2y$10$jpvZkC3GtKhh7ylgz/5X.OFajUfsq7OMKeVsXJzn4fNeR95PvUGD2', 'student', '2024-11-09 08:29:14'),
-(2, 'xyzowidumi@mailinator.com', '$2y$10$Qww9UOH8BksAB/uCdEFER.MVJBWAZA6z13IR7eqg9w88y/zEOjD3C', 'alumni', '2024-11-09 09:08:05');
+(2, 'xyzowidumi@mailinator.com', '$2y$10$Qww9UOH8BksAB/uCdEFER.MVJBWAZA6z13IR7eqg9w88y/zEOjD3C', 'alumni', '2024-11-09 09:08:05'),
+(3, 'annabel02@gmail.com', '$2y$10$6Hv1./7ZX3997KJizcwTT.hQMJGJ/Srqs3tpXVLCVEhQy03wqu6FW', 'student', '2024-11-20 05:13:50');
 
 --
 -- Indexes for dumped tables
@@ -412,6 +485,35 @@ ALTER TABLE `conversation_participants`
 ALTER TABLE `courses`
   ADD PRIMARY KEY (`id`),
   ADD KEY `school_id` (`school_id`);
+
+--
+-- Indexes for table `forum_categories`
+--
+ALTER TABLE `forum_categories`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `forum_replies`
+--
+ALTER TABLE `forum_replies`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `topic_id` (`topic_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `forum_topics`
+--
+ALTER TABLE `forum_topics`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `category_id` (`category_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `forum_topic_tags`
+--
+ALTER TABLE `forum_topic_tags`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `topic_id` (`topic_id`);
 
 --
 -- Indexes for table `jobs`
@@ -498,7 +600,7 @@ ALTER TABLE `alumni`
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `comment_likes`
@@ -525,6 +627,30 @@ ALTER TABLE `courses`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
+-- AUTO_INCREMENT for table `forum_categories`
+--
+ALTER TABLE `forum_categories`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `forum_replies`
+--
+ALTER TABLE `forum_replies`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `forum_topics`
+--
+ALTER TABLE `forum_topics`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `forum_topic_tags`
+--
+ALTER TABLE `forum_topic_tags`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `jobs`
 --
 ALTER TABLE `jobs`
@@ -534,7 +660,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `messages`
@@ -546,13 +672,13 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `post_shares`
 --
 ALTER TABLE `post_shares`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `post_tags`
@@ -570,13 +696,13 @@ ALTER TABLE `schools`
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
@@ -617,6 +743,26 @@ ALTER TABLE `conversation_participants`
 --
 ALTER TABLE `courses`
   ADD CONSTRAINT `courses_ibfk_1` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`);
+
+--
+-- Constraints for table `forum_replies`
+--
+ALTER TABLE `forum_replies`
+  ADD CONSTRAINT `forum_replies_ibfk_1` FOREIGN KEY (`topic_id`) REFERENCES `forum_topics` (`id`),
+  ADD CONSTRAINT `forum_replies_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `forum_topics`
+--
+ALTER TABLE `forum_topics`
+  ADD CONSTRAINT `forum_topics_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `forum_categories` (`id`),
+  ADD CONSTRAINT `forum_topics_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `forum_topic_tags`
+--
+ALTER TABLE `forum_topic_tags`
+  ADD CONSTRAINT `forum_topic_tags_ibfk_1` FOREIGN KEY (`topic_id`) REFERENCES `forum_topics` (`id`);
 
 --
 -- Constraints for table `jobs`
