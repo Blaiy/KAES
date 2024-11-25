@@ -22,6 +22,7 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'student';
 </head>
 <body class="bg-gray-50">
     <!-- Sidebar (Same as home.php) -->
+    <?php include 'partials/sidebar.php'; ?>
     
     <!-- Main Content -->
     <main class="lg:ml-64">
