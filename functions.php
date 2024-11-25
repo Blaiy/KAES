@@ -28,3 +28,13 @@ function getInitials($name) {
     }
     return $initials;
 } 
+function isAdmin($user_id) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT is_admin FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    error_log("User ID: $user_id, Admin Check: " . print_r($user, true));
+    
+    return $user && $user['is_admin'] == 1;
+}
