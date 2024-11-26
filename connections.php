@@ -1,6 +1,5 @@
 <?php
 session_start();
-require_once 'db.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -8,78 +7,51 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$current_user_id = $_SESSION['user_id'];
+// Database connection
+require_once 'db.php';
 
-// Handle connection actions
-if (isset($_POST['action'])) {
-    $connection_id = $_POST['connection_id'];
-    
-    switch ($_POST['action']) {
-        case 'accept':
-            $update_stmt = $db->prepare("UPDATE connections SET status = 'accepted' WHERE id = ? AND receiver_id = ?");
-            $update_stmt->bind_param("ii", $connection_id, $current_user_id);
-            $update_stmt->execute();
-            break;
-        
-        case 'reject':
-            $update_stmt = $db->prepare("UPDATE connections SET status = 'rejected' WHERE id = ? AND receiver_id = ?");
-            $update_stmt->bind_param("ii", $connection_id, $current_user_id);
-            $update_stmt->execute();
-            break;
-        
-        case 'remove':
-            $delete_stmt = $db->prepare("DELETE FROM connections WHERE id = ? AND (sender_id = ? OR receiver_id = ?)");
-            $delete_stmt->bind_param("iii", $connection_id, $current_user_id, $current_user_id);
-            $delete_stmt->execute();
+// Handle connection request
+if (isset($_GET['action']) && isset($_GET['user_id'])) {
+    $action = $_GET['action'];
+    $target_user_id = intval($_GET['user_id']);
+
+    switch ($action) {
+        case 'connect':
+            // Check if connection already exists
+            $check_query = "SELECT * FROM connections 
+                            WHERE (sender_id = :sender1 AND receiver_id = :receiver1) 
+                            OR (sender_id = :sender2 AND receiver_id = :receiver2)";
+            $check_stmt = $pdo->prepare($check_query);
+            $check_stmt->execute([
+                ':sender1' => $_SESSION['user_id'], 
+                ':receiver1' => $target_user_id,
+                ':sender2' => $target_user_id, 
+                ':receiver2' => $_SESSION['user_id']
+            ]);
+            $existing_connection = $check_stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$existing_connection) {
+                // Send connection request
+                $query = "INSERT INTO connections (sender_id, receiver_id, status) VALUES (:sender, :receiver, 'pending')";
+                $stmt = $pdo->prepare($query);
+                $stmt->execute([
+                    ':sender' => $_SESSION['user_id'], 
+                    ':receiver' => $target_user_id
+                ]);
+            }
             break;
     }
 }
 
-// Fetch connection requests
-$pending_requests_query = "
-    SELECT c.id, c.sender_id, u.name, u.avatar, u.position, u.company 
-    FROM connections c
-    JOIN users u ON c.sender_id = u.id
-    WHERE c.receiver_id = ? AND c.status = 'pending'
-";
-$pending_stmt = $db->prepare($pending_requests_query);
-$pending_stmt->bind_param("i", $current_user_id);
-$pending_stmt->execute();
-$pending_requests = $pending_stmt->get_result();
-
-// Fetch accepted connections
-$connections_query = "
-    SELECT 
-        c.id, 
-        CASE 
-            WHEN c.sender_id = ? THEN c2.id 
-            ELSE c1.id 
-        END as connected_user_id,
-        CASE 
-            WHEN c.sender_id = ? THEN c2.name 
-            ELSE c1.name 
-        END as connected_user_name,
-        CASE 
-            WHEN c.sender_id = ? THEN c2.avatar 
-            ELSE c1.avatar 
-        END as connected_user_avatar,
-        CASE 
-            WHEN c.sender_id = ? THEN c2.position 
-            ELSE c1.position 
-        END as connected_user_position
-    FROM connections c
-    JOIN users c1 ON c.sender_id = c1.id
-    JOIN users c2 ON c.receiver_id = c2.id
-    WHERE (c.sender_id = ? OR c.receiver_id = ?) 
-    AND c.status = 'accepted'
-";
-$connections_stmt = $db->prepare($connections_query);
-$connections_stmt->bind_param("iiiiii", 
-    $current_user_id, $current_user_id, $current_user_id, 
-    $current_user_id, $current_user_id, $current_user_id
-);
-$connections_stmt->execute();
-$connections = $connections_stmt->get_result();
+// Fetch all alumni except the current user
+$users_query = "SELECT a.*, s.name as school_name, c.name as course_name 
+                FROM alumni a
+                JOIN schools s ON a.school_id = s.id
+                JOIN courses c ON a.course_id = c.id
+                WHERE a.user_id != :user_id";
+$users_stmt = $pdo->prepare($users_query);
+$users_stmt->execute([':user_id' => $_SESSION['user_id']]);
+$users_result = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -87,69 +59,54 @@ $connections = $connections_stmt->get_result();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connection Management</title>
+    <title>Connect with Alumni</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body class="bg-gray-50">
-    <main class="container mx-auto px-4 py-8">
-        <div class="max-w-4xl mx-auto">
-            <h1 class="text-3xl font-bold mb-8">Connection Management</h1>
+    <!-- Sidebar -->
+    <?php include 'partials/sidebar.php'; ?>
+    
+    <!-- Main Content -->
+    <main class="lg:ml-64">
+        <div class="pt-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <h1 class="text-3xl font-bold mb-8">Connect with Alumni</h1>
 
-            <!-- Connection Requests Section -->
-            <section class="mb-12">
-                <h2 class="text-2xl font-semibold mb-4">Connection Requests</h2>
-                <?php if ($pending_requests->num_rows > 0): ?>
-                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <?php while ($request = $pending_requests->fetch_assoc()): ?>
-                            <div class="bg-white rounded-xl shadow-sm p-6">
-                                <div class="flex items-center space-x-4 mb-4">
-                                    <img src="<?php echo htmlspecialchars($request['avatar']); ?>" 
-                                         alt="Profile" class="w-16 h-16 rounded-full object-cover">
-                                    <div>
-                                        <h3 class="font-semibold"><?php echo htmlspecialchars($request['name']); ?></h3>
-                                        <p class="text-gray-600"><?php echo htmlspecialchars($request['position']); ?></p>
-                                    </div>
-                                </div>
-                                <div class="flex space-x-2">
-                                    <form method="POST" class="w-full">
-                                        <input type="hidden" name="connection_id" value="<?php echo $request['id']; ?>">
-                                        <div class="flex space-x-2">
-                                            <button type="submit" name="action" value="accept" 
-                                                    class="flex-1 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600">
-                                                Accept
-                                            </button>
-                                            <button type="submit" name="action" value="reject" 
-                                                    class="flex-1 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600">
-                                                Reject
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
+            <!-- Users Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <?php foreach ($users_result as $user): ?>
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <img src="<?php echo htmlspecialchars($user['avatar'] ?? 'default_avatar.png'); ?>" 
+                                 alt="Profile" class="w-16 h-16 rounded-full object-cover">
+                            <div>
+                                <h3 class="font-semibold"><?php echo htmlspecialchars($user['name']); ?></h3>
+                                <p class="text-gray-600">
+                                    <?php echo htmlspecialchars($user['job_title'] ?? 'Alumni'); ?> 
+                                    at <?php echo htmlspecialchars($user['company'] ?? $user['school_name']); ?>
+                                </p>
                             </div>
-                        <?php endwhile; ?>
+                        </div>
+                        <div class="flex space-x-2">
+                            <a href="?action=connect&user_id=<?php echo $user['user_id']; ?>" 
+                               class="flex-1 bg-kabarak-maroon text-white py-2 px-4 rounded-lg text-center hover:bg-kabarak-maroon/90">
+                                Connect
+                            </a>
+                            <a href="profile.php?user_id=<?php echo $user['user_id']; ?>" 
+                               class="flex-1 border border-kabarak-maroon text-kabarak-maroon py-2 px-4 rounded-lg text-center hover:bg-kabarak-maroon/10">
+                                View Profile
+                            </a>
+                        </div>
                     </div>
-                <?php else: ?>
-                    <p class="text-gray-500">No pending connection requests.</p>
-                <?php endif; ?>
-            </section>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </main>
 
-            <!-- Connections Section -->
-            <section>
-                <h2 class="text-2xl font-semibold mb-4">My Connections</h2>
-                <?php if ($connections->num_rows > 0): ?>
-                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <?php while ($connection = $connections->fetch_assoc()): ?>
-                            <div class="bg-white rounded-xl shadow-sm p-6">
-                                <div class="flex items-center space-x-4 mb-4">
-                                    <img src="<?php echo htmlspecialchars($connection['connected_user_avatar']); ?>" 
-                                         alt="Profile" class="w-16 h-16 rounded-full object-cover">
-                                    <div>
-                                        <h3 class="font-semibold">
-                                            <?php echo htmlspecialchars($connection['connected_user_name']); ?>
-                                        </h3>
-                                        <p class="text-gray-600">
-                                            <?php echo htmlspecialchars($connection['connected_user_position']); ?>
-                                        </p>
-                                    </div>
-                                </div>
+    <!-- Mobile Menu Button -->
+    <button class="lg:hidden fixed bottom-4 right-4 bg-kabarak-maroon text-white p-3 rounded-full shadow-lg" 
+            onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')">
+        <i class="ri-menu-line text-xl"></i>
+    </button>
+</body>
+</html>

@@ -130,12 +130,12 @@ $user_type = isset($_SESSION['user_type']) ? $_SESSION['user_type'] : 'student';
                             </div>
                         </div>
                         <div class="mt-4 flex space-x-2">
-                            <button class="flex-1 bg-kabarak-maroon text-white py-2 px-4 rounded-lg hover:bg-kabarak-maroon/90">
+                            <a href="connections.php" class="flex-1 bg-kabarak-maroon text-white py-2 px-4 rounded-lg hover:bg-kabarak-maroon/90 text-center">
                                 Connect
-                            </button>
-                            <button class="flex-1 border border-kabarak-maroon text-kabarak-maroon py-2 px-4 rounded-lg hover:bg-kabarak-maroon/10">
+                            </a>
+                            <a href="messages.php" class="flex-1 border border-kabarak-maroon text-kabarak-maroon py-2 px-4 rounded-lg hover:bg-kabarak-maroon/10 text-center">
                                 Message
-                            </button>
+                            </a>
                         </div>
                     </div>
                     <?php endforeach; ?>
