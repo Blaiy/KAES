@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 20, 2024 at 05:24 PM
+-- Generation Time: Nov 26, 2024 at 10:06 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -95,6 +95,27 @@ CREATE TABLE `comment_likes` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `connections`
+--
+
+CREATE TABLE `connections` (
+  `id` int(11) NOT NULL,
+  `sender_id` int(11) DEFAULT NULL,
+  `receiver_id` int(11) DEFAULT NULL,
+  `status` enum('pending','accepted','rejected') DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `connections`
+--
+
+INSERT INTO `connections` (`id`, `sender_id`, `receiver_id`, `status`, `created_at`) VALUES
+(1, 1, 2, 'pending', '2024-11-26 08:58:12');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `conversations`
 --
 
@@ -163,111 +184,21 @@ INSERT INTO `courses` (`id`, `name`, `code`, `school_id`) VALUES
 
 CREATE TABLE `events` (
   `id` int(11) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL,
-  `start_datetime` datetime NOT NULL,
-  `end_datetime` datetime NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `event_date` date NOT NULL,
   `location` varchar(255) DEFAULT NULL,
-  `venue_details` text DEFAULT NULL,
-  `image_url` varchar(255) DEFAULT NULL,
-  `max_participants` int(11) DEFAULT NULL,
-  `registration_deadline` datetime DEFAULT NULL,
-  `event_type` enum('in_person','virtual','hybrid') NOT NULL DEFAULT 'in_person',
-  `meeting_link` varchar(255) DEFAULT NULL,
-  `organizer_id` int(11) NOT NULL,
-  `status` enum('draft','published','cancelled','completed') NOT NULL DEFAULT 'published',
-  `is_featured` tinyint(1) NOT NULL DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `event_categories`
---
-
-CREATE TABLE `event_categories` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
   `description` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `category` varchar(50) DEFAULT NULL,
+  `image_url` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `event_categories`
+-- Dumping data for table `events`
 --
 
-INSERT INTO `event_categories` (`id`, `name`, `description`, `created_at`) VALUES
-(1, 'Networking', 'Professional networking events and meetups', '2024-11-20 11:24:10'),
-(2, 'Workshop', 'Hands-on learning and skill development sessions', '2024-11-20 11:24:10'),
-(3, 'Conference', 'Large-scale professional gatherings and presentations', '2024-11-20 11:24:10'),
-(4, 'Career Fair', 'Job and internship opportunities', '2024-11-20 11:24:10'),
-(5, 'Alumni Reunion', 'Gatherings for alumni to reconnect', '2024-11-20 11:24:10'),
-(6, 'Seminar', 'Educational presentations and discussions', '2024-11-20 11:24:10'),
-(7, 'Social', 'Casual social gatherings and activities', '2024-11-20 11:24:10'),
-(8, 'Fundraising', 'Events to support charitable causes', '2024-11-20 11:24:10'),
-(9, 'Training', 'Professional development and training sessions', '2024-11-20 11:24:10'),
-(10, 'Other', 'Miscellaneous events', '2024-11-20 11:24:10');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `event_category_relationships`
---
-
-CREATE TABLE `event_category_relationships` (
-  `event_id` int(11) NOT NULL,
-  `category_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `event_feedback`
---
-
-CREATE TABLE `event_feedback` (
-  `id` int(11) NOT NULL,
-  `event_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `rating` tinyint(4) NOT NULL CHECK (`rating` between 1 and 5),
-  `feedback_text` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `event_registrations`
---
-
-CREATE TABLE `event_registrations` (
-  `id` int(11) NOT NULL,
-  `event_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `registration_status` enum('pending','confirmed','cancelled','attended') NOT NULL DEFAULT 'confirmed',
-  `registration_type` enum('regular','vip','guest') NOT NULL DEFAULT 'regular',
-  `notes` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `event_reminders`
---
-
-CREATE TABLE `event_reminders` (
-  `id` int(11) NOT NULL,
-  `event_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `reminder_time` datetime NOT NULL,
-  `reminder_type` enum('email','sms','in_app') NOT NULL,
-  `reminder_status` enum('pending','sent','failed') NOT NULL DEFAULT 'pending',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT INTO `events` (`id`, `name`, `event_date`, `location`, `description`, `category`, `image_url`) VALUES
+(1, 'SSET HACKATHON', '2024-12-07', 'Kabarak KLAW Katiba auditorium', '', 'academic', 'uploads/events/674472be516ca_Hackathon Roadmap.jpeg'),
+(2, 'SLAW MOOT COURT', '2024-11-09', 'Kabarak KLAW Katiba auditorium', 'Come let\'s compete', 'Academic', 'uploads/events/6744933799f07_Metal Poster Displate _Court Is In Session_.jpeg');
 
 -- --------------------------------------------------------
 
@@ -399,10 +330,11 @@ CREATE TABLE `likes` (
 
 INSERT INTO `likes` (`id`, `post_id`, `user_id`, `created_at`) VALUES
 (6, 3, 2, '2024-11-09 20:23:52'),
-(7, 4, 1, '2024-11-09 20:48:50'),
 (8, 5, 1, '2024-11-20 05:27:26'),
 (9, 5, 2, '2024-11-20 07:59:10'),
-(10, 4, 2, '2024-11-20 08:00:42');
+(10, 4, 2, '2024-11-20 08:00:42'),
+(11, 3, 1, '2024-11-25 11:42:45'),
+(12, 4, 1, '2024-11-25 11:43:02');
 
 -- --------------------------------------------------------
 
@@ -433,8 +365,8 @@ INSERT INTO `messages` (`id`, `sender_id`, `receiver_id`, `content`, `is_read`, 
 (7, 2, 1, 'Warning: Undefined array key \"additional_info\" in C:\\xampp\\htdocs\\KAES\\messages.php on line 120', 1, '2024-11-09 18:13:17'),
 (8, 1, 2, 'good', 1, '2024-11-20 07:36:30'),
 (9, 1, 2, 'great', 1, '2024-11-20 07:39:11'),
-(10, 2, 1, 'hello', 0, '2024-11-20 07:59:37'),
-(11, 2, 1, 'how\'s your afternoon', 0, '2024-11-20 14:02:32');
+(10, 2, 1, 'hello', 1, '2024-11-20 07:59:37'),
+(11, 2, 1, 'how\'s your afternoon', 1, '2024-11-20 14:02:32');
 
 -- --------------------------------------------------------
 
@@ -559,7 +491,7 @@ CREATE TABLE `students` (
 --
 
 INSERT INTO `students` (`id`, `user_id`, `name`, `reg_number`, `phone`, `school_id`, `course_id`, `year_of_study`, `created_at`, `avatar`, `location`) VALUES
-(1, 1, 'Asher Stanton', '132', '+1 (909) 525-5129', 1, 1, 'Y1S1', '2024-11-09 08:29:14', 'default_avatar.png', NULL),
+(1, 1, 'Asher Stanton', '132', '+1 (909) 525-5129', 1, 1, 'Y1S1', '2024-11-09 08:29:14', 'default_avatar.png', ''),
 (2, 3, 'Annabel Blessing', 'CS/MG/3073/09/21', '0711234323', 1, 1, 'Y4S2', '2024-11-20 05:13:50', 'default_avatar.png', NULL);
 
 -- --------------------------------------------------------
@@ -585,7 +517,7 @@ INSERT INTO `users` (`id`, `email`, `password`, `user_type`, `created_at`, `is_a
 (1, 'xixijysy@mailinator.com', '$2y$10$jpvZkC3GtKhh7ylgz/5X.OFajUfsq7OMKeVsXJzn4fNeR95PvUGD2', 'student', '2024-11-09 08:29:14', 0),
 (2, 'xyzowidumi@mailinator.com', '$2y$10$Qww9UOH8BksAB/uCdEFER.MVJBWAZA6z13IR7eqg9w88y/zEOjD3C', 'alumni', '2024-11-09 09:08:05', 0),
 (3, 'annabel02@gmail.com', '$2y$10$6Hv1./7ZX3997KJizcwTT.hQMJGJ/Srqs3tpXVLCVEhQy03wqu6FW', 'student', '2024-11-20 05:13:50', 0),
-(4, 'admin@gmail.com', 'admin-pass', 'student', '2024-11-20 15:24:02', 1);
+(4, 'admin@gmail.com', '$2y$10$gak1LMcVhFNzB0B/jgrVp.LPqMUcEjv3a4Zk96N02WwWYP2QQhEC2', '', '2024-11-20 15:24:02', 1);
 
 --
 -- Indexes for dumped tables
@@ -619,6 +551,12 @@ ALTER TABLE `comment_likes`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `connections`
+--
+ALTER TABLE `connections`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `conversations`
 --
 ALTER TABLE `conversations`
@@ -645,54 +583,7 @@ ALTER TABLE `courses`
 -- Indexes for table `events`
 --
 ALTER TABLE `events`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `organizer_id` (`organizer_id`),
-  ADD KEY `idx_start_datetime` (`start_datetime`),
-  ADD KEY `idx_end_datetime` (`end_datetime`),
-  ADD KEY `idx_status` (`status`),
-  ADD KEY `idx_featured` (`is_featured`);
-
---
--- Indexes for table `event_categories`
---
-ALTER TABLE `event_categories`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_category_name` (`name`);
-
---
--- Indexes for table `event_category_relationships`
---
-ALTER TABLE `event_category_relationships`
-  ADD PRIMARY KEY (`event_id`,`category_id`),
-  ADD KEY `category_id` (`category_id`);
-
---
--- Indexes for table `event_feedback`
---
-ALTER TABLE `event_feedback`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_feedback_per_user` (`event_id`,`user_id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `idx_rating` (`rating`);
-
---
--- Indexes for table `event_registrations`
---
-ALTER TABLE `event_registrations`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_event_user` (`event_id`,`user_id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `idx_registration_status` (`registration_status`);
-
---
--- Indexes for table `event_reminders`
---
-ALTER TABLE `event_reminders`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `event_id` (`event_id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `idx_reminder_time` (`reminder_time`),
-  ADD KEY `idx_reminder_status` (`reminder_status`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `forum_categories`
@@ -817,6 +708,12 @@ ALTER TABLE `comment_likes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `connections`
+--
+ALTER TABLE `connections`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `conversations`
 --
 ALTER TABLE `conversations`
@@ -838,31 +735,7 @@ ALTER TABLE `courses`
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `event_categories`
---
-ALTER TABLE `event_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT for table `event_feedback`
---
-ALTER TABLE `event_feedback`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `event_registrations`
---
-ALTER TABLE `event_registrations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `event_reminders`
---
-ALTER TABLE `event_reminders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `forum_categories`
@@ -898,7 +771,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `messages`
@@ -981,40 +854,6 @@ ALTER TABLE `conversation_participants`
 --
 ALTER TABLE `courses`
   ADD CONSTRAINT `courses_ibfk_1` FOREIGN KEY (`school_id`) REFERENCES `schools` (`id`);
-
---
--- Constraints for table `events`
---
-ALTER TABLE `events`
-  ADD CONSTRAINT `events_ibfk_1` FOREIGN KEY (`organizer_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `event_category_relationships`
---
-ALTER TABLE `event_category_relationships`
-  ADD CONSTRAINT `event_category_relationships_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `event_category_relationships_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `event_categories` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `event_feedback`
---
-ALTER TABLE `event_feedback`
-  ADD CONSTRAINT `event_feedback_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `event_feedback_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `event_registrations`
---
-ALTER TABLE `event_registrations`
-  ADD CONSTRAINT `event_registrations_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `event_registrations_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `event_reminders`
---
-ALTER TABLE `event_reminders`
-  ADD CONSTRAINT `event_reminders_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `event_reminders_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `forum_replies`
